@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Compress to Success — Team Feedback</title>
+<style>
+:root{
+  --navy: #16294B;
+  --navy-deep: #0D1B33;
+  --amber: #C97D2C;
+  --amber-deep: #A8621B;
+  --paper: #F5F6F8;
+  --line: #E2E5EA;
+  --ink: #1C2434;
+  --ink-soft: #5B6472;
+  --good: #3F7A5C;
+}
+
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;
+  background:var(--paper);
+  color:var(--ink);
+  min-height:100vh;
+}
+
+.wrap{max-width:760px;margin:0 auto;padding-bottom:64px;}
+
+.hero{
+  background:linear-gradient(135deg,var(--navy) 0%, var(--navy-deep) 100%);
+  color:#fff;
+  padding:36px 28px 30px;
+  position:relative;
+  overflow:hidden;
+}
+.hero::after{
+  content:"";
+  position:absolute; right:-60px; top:-60px;
+  width:220px; height:220px; border-radius:50%;
+  border:14px solid rgba(201,125,44,0.18);
+}
+.eyebrow{
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;
+  font-weight:700; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--amber); font-size:13px; margin:0 0 6px;
+}
+.hero h1{
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;
+  font-weight:800; font-size:38px; line-height:1; margin:0 0 10px; letter-spacing:.01em;
+}
+.hero p{margin:0; color:#C8D0DE; font-size:14.5px; max-width:52ch;}
+
+.tabbar{
+  display:flex; gap:0; background:var(--navy-deep); position:relative; z-index:1;
+}
+.tabbar button{
+  flex:1; border:none; background:transparent; color:#9AA6BB;
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif; font-weight:600; font-size:13.5px;
+  padding:13px 10px; cursor:pointer; letter-spacing:.02em;
+  border-bottom:3px solid transparent;
+}
+.tabbar button.active{color:#fff; border-bottom-color:var(--amber);}
+
+.card{
+  background:#fff; border:1px solid var(--line); border-radius:10px;
+  margin:20px 24px; padding:22px 22px 20px;
+}
+.card.condQ, .card.condRole{border-color:#E9D3B8; background:#FFFDFA;}
+.condflag{
+  display:inline-block; font-size:10.5px; font-weight:700; letter-spacing:.05em;
+  text-transform:uppercase; color:var(--amber-deep); background:#FBEBD9;
+  padding:2px 8px; border-radius:20px; margin-bottom:8px;
+}
+.qlabel{
+  font-weight:600; font-size:15px; margin:0 0 4px; color:var(--ink);
+}
+.qhint{font-size:12.5px; color:var(--ink-soft); margin:0 0 14px;}
+
+.scale{display:flex; gap:8px; flex-wrap:wrap;}
+.scale button{
+  flex:1; min-width:44px; border:1.5px solid var(--line); background:#fff;
+  border-radius:8px; padding:10px 0; font-weight:700; font-size:15px;
+  color:var(--navy); cursor:pointer; transition:.12s;
+}
+.scale button:hover{border-color:var(--amber);}
+.scale button.sel{background:var(--amber); border-color:var(--amber); color:#fff;}
+.scalecaps{display:flex; justify-content:space-between; font-size:11px; color:var(--ink-soft); margin-top:6px;}
+
+.choices{display:flex; flex-direction:column; gap:8px;}
+.choice{
+  border:1.5px solid var(--line); border-radius:8px; padding:11px 14px;
+  cursor:pointer; font-size:14px; display:flex; align-items:center; gap:10px;
+  transition:.12s;
+}
+.choice:hover{border-color:var(--amber);}
+.choice.sel{border-color:var(--amber); background:#FBF1E7;}
+.dot{width:16px; height:16px; border-radius:50%; border:2px solid var(--line); flex:none;}
+.choice.sel .dot{border-color:var(--amber); background:var(--amber);}
+.box{width:16px; height:16px; border-radius:4px; border:2px solid var(--line); flex:none;}
+.choice.sel .box{border-color:var(--amber); background:var(--amber);}
+
+textarea{
+  width:100%; border:1.5px solid var(--line); border-radius:8px; padding:12px;
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif; font-size:14px; resize:vertical; min-height:80px; color:var(--ink);
+}
+textarea:focus, .scale button:focus, .choice:focus{outline:2px solid var(--amber); outline-offset:1px;}
+
+.submitbar{padding:4px 24px 30px;}
+.submitbtn{
+  width:100%; background:var(--amber); color:#fff; border:none; border-radius:9px;
+  padding:15px; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif; font-weight:700; font-size:15px; cursor:pointer;
+}
+.submitbtn:hover{background:var(--amber-deep);}
+.submitbtn:disabled{background:#C9CDD6; cursor:not-allowed;}
+
+.donemsg{
+  margin:24px 24px; padding:28px 22px; text-align:center;
+  border:1.5px solid var(--good); border-radius:10px; background:#EFF6F1;
+}
+.donemsg h2{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif; font-size:26px; color:var(--good); margin:0 0 6px;}
+.donemsg p{color:var(--ink-soft); font-size:14px; margin:0;}
+
+.statrow{display:flex; gap:12px; margin:20px 24px 0;}
+.stat{
+  flex:1; background:#fff; border:1px solid var(--line); border-radius:10px;
+  padding:16px; text-align:center;
+}
+.stat .num{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif; font-weight:800; font-size:30px; color:var(--navy);}
+.stat .lbl{font-size:11px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.06em;}
+
+.barq{margin-bottom:16px;}
+.barq:last-child{margin-bottom:0;}
+.barq .qt{font-size:13.5px; font-weight:600; margin-bottom:6px;}
+.barq .qn{font-size:11.5px; color:var(--ink-soft); margin:-4px 0 6px;}
+.barrow{display:flex; align-items:center; gap:8px; margin-bottom:5px;}
+.barrow .barlbl{width:76px; font-size:12px; color:var(--ink-soft); flex:none;}
+.bartrack{flex:1; background:var(--paper); border-radius:5px; height:14px; overflow:hidden;}
+.barfill{height:100%; background:var(--amber); border-radius:5px;}
+.barval{width:34px; font-size:12px; color:var(--ink-soft); text-align:right; flex:none;}
+
+.commentbox{
+  background:var(--paper); border-radius:8px; padding:12px 14px; font-size:13.5px;
+  margin-bottom:8px; color:var(--ink); border-left:3px solid var(--amber);
+}
+.emptynote{color:var(--ink-soft); font-size:13.5px; font-style:italic;}
+
+.goalline{
+  display:flex; align-items:center; gap:8px; font-size:12px; color:var(--ink-soft); margin-top:8px;
+}
+.goalpill{
+  background:var(--navy); color:#fff; font-weight:700; font-size:11px;
+  padding:2px 9px; border-radius:20px;
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <p class="eyebrow">Compress to Success — CPR Quality Refresher</p>
+    <h1 id="heroTitle">Team Feedback</h1>
+    <p>Two minutes, honest answers. This shapes whether we run the next workshop — and how.</p>
+  </div>
+  <div class="tabbar">
+    <button id="tabSurvey" class="active">Take the survey</button>
+    <button id="tabResults">View results</button>
+  </div>
+
+  <div id="surveyView"></div>
+  <div id="resultsView" style="display:none;"></div>
+</div>
+
+<script>
+const SCALE_LABELS_DEFAULT = {low:"Not at all", high:"Extremely"};
+
+// Paste the Web app URL from your Apps Script deployment here.
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxZIPr8WeA-QopcU5DM85iiCBLhC0qo0NYFDHeEo2siG8gypXkoZOe4lape5AGZTd3K/exec";
+
+// Change this to whatever passcode you want to share with leadership/education staff.
+const RESULTS_PASSCODE = "ALERT2026";
+let resultsUnlocked = false;
+
+const QUESTIONS = [
+  {id:"q_role", type:"single", label:"Your role", hint:"",
+    options:["RN","Physician","Respiratory Therapist","CNA","Medical student","Nursing student","Other"]},
+  {id:"q_unit_category", type:"single", label:"Which category best describes your unit?", hint:"RNs only — narrows the unit list below.", roleGate:true,
+    options:["Med-Surg","Tele","Stepdown","ICU","Other"]},
+  {id:"q_unit", type:"single", label:"Select your home unit", hint:"", roleGate:true, dynamic:true, writeInOption:"Other, please specify", options:[]},
+  {id:"q_aclscert", type:"single", label:"Are you an ACLS-certified clinician?", 
+    hint:"This determines whether you'll see the defib-specific questions below.",
+    options:["Yes","No"]},
+  {id:"q1_value", type:"scale", label:"Overall, how valuable was this training?", hint:"1 = not valuable, 5 = extremely valuable"},
+  {id:"q2_before", type:"scale", label:"Before the workshop, how confident were you hitting depth, rate, and recoil targets together?", hint:"1 = not confident, 5 = extremely confident"},
+  {id:"q3_after", type:"scale", label:"Right now, how confident are you hitting those same targets?", hint:"1 = not confident, 5 = extremely confident"},
+  {id:"q_shockconf_before", type:"scale", label:"Before today's hands-on defibrillation practice, how confident were you in your ability to make the call to shock independently?", hint:"1 = not confident, 5 = extremely confident", conditional:true},
+  {id:"q_shockconf_after", type:"scale", label:"After today's hands-on practice, how confident do you feel now?", hint:"1 = not confident, 5 = extremely confident", conditional:true},
+  {id:"q_rhythmid", type:"scale", label:"How confident are you identifying a shockable rhythm (VF / pulseless VT) independently, without waiting for the code team to confirm it?", hint:"1 = not confident, 5 = extremely confident", conditional:true},
+  {id:"q4_shock", type:"scale", label:"How confident are you running the pre-defibrillation safety checklist solo?", hint:"1 = not confident, 5 = extremely confident", conditional:true},
+  {id:"q_shockalone", type:"scale", label:"How likely are you to shock without the code team present?", hint:"1 = unlikely, 5 = very likely", conditional:true},
+  {id:"q_shockbarriers", type:"multi", label:"What, if anything, makes you hesitate to defibrillate independently when indicated?", hint:"Select all that apply", conditional:true, writeInOption:"Other (please specify)",
+    options:["Uncertain about rhythm interpretation","Waiting for MD / senior staff, even when not required","Unfamiliar with the defibrillator itself","Worried about being wrong / consequences","Not enough hands-on practice","Don't feel it's \"my call\" to make","Other (please specify)","I am comfortable shocking — none of these apply to me."]},
+  {id:"q_refresher_freq", type:"single", label:"How often would you like a refresher on these topics?", hint:"",
+    options:["Every quarter","Twice a year","Yearly","Not at all"]},
+  {id:"q9_comments", type:"text", label:"Anything specific you'd change about the workshop or the follow-up practice?", hint:"Optional"}
+];
+
+const UNIT_CATALOG = {
+  "Med-Surg": ["ORA DH32 ORTHOPAEDICS","ORA DH48/DH58 SURGICAL","ORA T4 MEDICAL"],
+  "Tele": ["ORA B3 3RD FL SURGICAL","ORA T3 MEDICAL TELEMETRY","ORA T5 MEDICAL TELEMETRY","ORA DH76/DH78 ONCOLOGY"],
+  "Stepdown": ["ORA DH56 NEURO STEPDOWN","ORA DH66/DH68 SURGICAL STEPDOWN","ORA DH44 CARDVASC SURG"],
+  "ICU": ["ORA DH52 NEUROSCIENCE ICU","ORA DH54 BURN ICU","ORA DH62/DH64 SURGICAL ICU","ORA DH74 MEDICAL ICU","ORA DH72 CARDIAC CARE"],
+  "Other": ["ORA ACUTE REHAB B3 1S","ORA CATH LAB","ORA CENTER FOR PERIOP CARE","ORA DH INTERV PULMONOLOGY LAB","ORA DH IR","ORA DH15 DIALYSIS 1st FLOOR","ORA DH46 MOTHER BABY","ORA CDDC","ORA EMERGENCY DEPARTMENT","ORA EMERGENCY DEPARTMENT ANNEX","ORA IR","ORA MAIN OR","ORA MAIN PACU","ORA MAIN PPCU","ORA MH B3 2N, B3 1N, B3 2S","ORA L&D + MOTHER-BABY","ORA RADIATION/ONCOLOGY","ORA DC LOUNGE","ORA OUTPATIENT CLINIC","ORA OTHER"]
+};
+
+let state = {};
+QUESTIONS.forEach(q=>{
+  state[q.id] = (q.type==="multi") ? [] : (q.type==="text" ? "" : null);
+  if(q.writeInOption){ state[q.id+"_other"] = ""; }
+});
+
+function renderSurvey(){
+  const el = document.getElementById('surveyView');
+  let html = '';
+  QUESTIONS.forEach(q=>{
+    const condClass = q.conditional ? ' condQ' : (q.roleGate ? ' condRole' : '');
+    const condStyle = (q.conditional || q.roleGate) ? ' style="display:none;"' : '';
+    html += `<div class="card${condClass}" data-q="${q.id}"${condStyle}>`;
+    if(q.conditional) html += `<span class="condflag">ACLS-authorized only</span>`;
+    if(q.roleGate) html += `<span class="condflag">RN only</span>`;
+    html += `<p class="qlabel">${q.label}</p>`;
+    if(q.hint) html += `<p class="qhint">${q.hint}</p>`;
+    if(q.type==="scale"){
+      html += `<div class="scale">`;
+      for(let i=1;i<=5;i++){ html += `<button type="button" data-val="${i}">${i}</button>`; }
+      html += `</div><div class="scalecaps"><span>${SCALE_LABELS_DEFAULT.low}</span><span>${SCALE_LABELS_DEFAULT.high}</span></div>`;
+    } else if(q.type==="single" && q.dynamic){
+      html += `<p class="unitnote qhint" style="margin-top:-6px;">Pick a category above first.</p>`;
+      html += `<div class="choices"></div>`;
+      html += `<textarea class="otherWriteIn" placeholder="Type your unit name..." style="display:none; margin-top:10px;"></textarea>`;
+    } else if(q.type==="single"){
+      html += `<div class="choices">`;
+      q.options.forEach(opt=>{ html += `<div class="choice" data-val="${opt}"><span class="dot"></span>${opt}</div>`; });
+      html += `</div>`;
+    } else if(q.type==="multi"){
+      html += `<div class="choices">`;
+      q.options.forEach(opt=>{ html += `<div class="choice" data-val="${opt}"><span class="box"></span>${opt}</div>`; });
+      html += `</div>`;
+      if(q.writeInOption){
+        html += `<textarea class="otherWriteIn" placeholder="Tell us more..." style="display:none; margin-top:10px;"></textarea>`;
+      }
+    } else if(q.type==="text"){
+      html += `<textarea placeholder="Type here..."></textarea>`;
+    }
+    html += `</div>`;
+  });
+  html += `<div class="submitbar"><button class="submitbtn" id="submitBtn">Submit feedback</button></div>`;
+  el.innerHTML = html;
+  wireSurvey();
+}
+
+function toggleRoleGate(val){
+  const show = val === "RN";
+  document.querySelectorAll('.condRole').forEach(el=>{ el.style.display = show ? 'block' : 'none'; });
+  if(!show){
+    state.q_unit_category = null;
+    state.q_unit = null;
+    state.q_unit_other = "";
+    document.querySelectorAll('.condRole .choice.sel').forEach(c=>c.classList.remove('sel'));
+    const unitCard = document.querySelector('[data-q="q_unit"]');
+    if(unitCard){
+      const choicesDiv = unitCard.querySelector('.choices');
+      if(choicesDiv) choicesDiv.innerHTML = '';
+      const note = unitCard.querySelector('.unitnote');
+      if(note) note.style.display = 'block';
+      const ta = unitCard.querySelector('.otherWriteIn');
+      if(ta){ ta.style.display = 'none'; ta.value = ''; }
+    }
+  }
+}
+
+function populateUnitOptions(category){
+  state.q_unit_category = category;
+  state.q_unit = null;
+  state.q_unit_other = "";
+  const card = document.querySelector('[data-q="q_unit"]');
+  const note = card.querySelector('.unitnote');
+  if(note) note.style.display = 'none';
+  const choicesDiv = card.querySelector('.choices');
+  const units = (UNIT_CATALOG[category] || []).concat(["Other, please specify"]);
+  choicesDiv.innerHTML = units.map(u=>`<div class="choice" data-val="${u}"><span class="dot"></span>${u}</div>`).join('');
+  const ta = card.querySelector('.otherWriteIn');
+  ta.style.display = 'none';
+  ta.value = '';
+  choicesDiv.querySelectorAll('.choice').forEach(c=>{
+    c.addEventListener('click', ()=>{
+      choicesDiv.querySelectorAll('.choice').forEach(x=>x.classList.remove('sel'));
+      c.classList.add('sel');
+      state.q_unit = c.dataset.val;
+      if(c.dataset.val === "Other, please specify"){
+        ta.style.display = 'block';
+      } else {
+        ta.style.display = 'none';
+        ta.value = '';
+        state.q_unit_other = '';
+      }
+    });
+  });
+  if(!ta.dataset.wired){
+    ta.addEventListener('input', (e)=>{ state.q_unit_other = e.target.value; });
+    ta.dataset.wired = "1";
+  }
+}
+
+function toggleConditional(val){
+  const show = val === "Yes";
+  document.querySelectorAll('.condQ').forEach(el=>{ el.style.display = show ? 'block' : 'none'; });
+  if(!show){
+    QUESTIONS.filter(q=>q.conditional).forEach(q=>{
+      state[q.id] = (q.type==="multi") ? [] : null;
+      if(q.writeInOption){ state[q.id+"_other"] = ""; }
+    });
+    document.querySelectorAll('.condQ .scale button.sel').forEach(b=>b.classList.remove('sel'));
+    document.querySelectorAll('.condQ .choice.sel').forEach(c=>c.classList.remove('sel'));
+    document.querySelectorAll('.condQ .otherWriteIn').forEach(ta=>{ ta.style.display = 'none'; ta.value = ''; });
+  }
+}
+
+function wireSurvey(){
+  QUESTIONS.forEach(q=>{
+    const card = document.querySelector(`[data-q="${q.id}"]`);
+    if(q.type==="scale"){
+      card.querySelectorAll('.scale button').forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          card.querySelectorAll('.scale button').forEach(b=>b.classList.remove('sel'));
+          btn.classList.add('sel');
+          state[q.id] = parseInt(btn.dataset.val,10);
+        });
+      });
+    } else if(q.type==="single"){
+      card.querySelectorAll('.choice').forEach(c=>{
+        c.addEventListener('click', ()=>{
+          card.querySelectorAll('.choice').forEach(x=>x.classList.remove('sel'));
+          c.classList.add('sel');
+          state[q.id] = c.dataset.val;
+          if(q.id === "q_aclscert"){ toggleConditional(c.dataset.val); }
+          if(q.id === "q_role"){ toggleRoleGate(c.dataset.val); }
+          if(q.id === "q_unit_category"){ populateUnitOptions(c.dataset.val); }
+        });
+      });
+    } else if(q.type==="multi"){
+      card.querySelectorAll('.choice').forEach(c=>{
+        c.addEventListener('click', ()=>{
+          c.classList.toggle('sel');
+          const val = c.dataset.val;
+          const arr = state[q.id];
+          const idx = arr.indexOf(val);
+          if(idx>-1) arr.splice(idx,1); else arr.push(val);
+          if(q.writeInOption){
+            const ta = card.querySelector('.otherWriteIn');
+            if(arr.includes(q.writeInOption)){
+              ta.style.display = 'block';
+            } else {
+              ta.style.display = 'none';
+              ta.value = '';
+              state[q.id+"_other"] = '';
+            }
+          }
+        });
+      });
+      if(q.writeInOption){
+        const ta = card.querySelector('.otherWriteIn');
+        if(ta){ ta.addEventListener('input', (e)=>{ state[q.id+"_other"] = e.target.value; }); }
+      }
+    } else if(q.type==="text"){
+      card.querySelector('textarea').addEventListener('input', (e)=>{
+        state[q.id] = e.target.value;
+      });
+    }
+  });
+  document.getElementById('submitBtn').addEventListener('click', submitSurvey);
+}
+
+async function submitSurvey(){
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = "Submitting...";
+  const record = { ts: Date.now(), ...state };
+  try{
+    const resp = await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // avoids CORS preflight with Apps Script
+      body: JSON.stringify(record)
+    });
+    const result = await resp.json();
+    if(!result || !result.success){
+      btn.disabled = false;
+      btn.textContent = "Submit feedback";
+      alert("Something went wrong saving your response — please try again.");
+      return;
+    }
+    document.getElementById('surveyView').innerHTML = `
+      <div class="donemsg">
+        <h2>Thanks — logged.</h2>
+        <p>Your feedback just rolled into the team tally. Switch to "View results" to see where things stand.</p>
+      </div>`;
+  } catch(err){
+    btn.disabled = false;
+    btn.textContent = "Submit feedback";
+    alert("Something went wrong saving your response — please try again.");
+    console.error(err);
+  }
+}
+
+async function loadResponses(){
+  try{
+    const resp = await fetch(APPS_SCRIPT_URL, { method: 'GET' });
+    const data = await resp.json();
+    return Array.isArray(data) ? data : [];
+  } catch(e){
+    console.error("Failed to load responses", e);
+    return [];
+  }
+}
+
+function avg(nums){
+  const clean = nums.filter(n=>typeof n === 'number');
+  if(clean.length===0) return null;
+  return clean.reduce((a,b)=>a+b,0)/clean.length;
+}
+
+function tally(records, key){
+  const counts = {};
+  records.forEach(r=>{
+    const v = r[key];
+    if(Array.isArray(v)){
+      v.forEach(item=>{ counts[item] = (counts[item]||0)+1; });
+    } else if(v){
+      counts[v] = (counts[v]||0)+1;
+    }
+  });
+  return counts;
+}
+
+function barsFromCounts(counts, total){
+  const entries = Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+  if(entries.length===0) return `<p class="emptynote">No responses yet.</p>`;
+  return entries.map(([label,count])=>{
+    const pct = total>0 ? Math.round((count/total)*100) : 0;
+    return `<div class="barrow">
+      <span class="barlbl">${label}</span>
+      <span class="bartrack"><span class="barfill" style="width:${pct}%"></span></span>
+      <span class="barval">${count}</span>
+    </div>`;
+  }).join('');
+}
+
+function scaleBar(label, value, note){
+  const pct = value===null ? 0 : Math.round((value/5)*100);
+  const display = value===null ? "—" : value.toFixed(1);
+  return `<div class="barq">
+    <p class="qt">${label}</p>
+    ${note ? `<p class="qn">${note}</p>` : ''}
+    <div class="barrow">
+      <span class="barlbl">Avg / 5</span>
+      <span class="bartrack"><span class="barfill" style="width:${pct}%"></span></span>
+      <span class="barval">${display}</span>
+    </div>
+  </div>`;
+}
+
+function renderPasscodeGate(errorMsg){
+  const el = document.getElementById('resultsView');
+  el.innerHTML = `
+    <div class="card" style="text-align:center; padding:32px 24px;">
+      <p class="qlabel" style="margin-bottom:6px;">Results are passcode-protected</p>
+      <p class="qhint" style="margin-bottom:16px;">Ask whoever's running this survey for the code.</p>
+      <input type="password" id="passInput" placeholder="Enter passcode"
+        style="width:100%; max-width:260px; border:1.5px solid var(--line); border-radius:8px; padding:11px 14px; font-size:14px; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif; margin-bottom:12px;">
+      ${errorMsg ? `<p style="color:#B4483A; font-size:13px; margin:-4px 0 12px;">${errorMsg}</p>` : ''}
+      <br>
+      <button class="submitbtn" id="unlockBtn" style="max-width:260px;">Unlock</button>
+    </div>`;
+  const input = document.getElementById('passInput');
+  const tryUnlock = ()=>{
+    if(input.value === RESULTS_PASSCODE){
+      resultsUnlocked = true;
+      renderResults();
+    } else {
+      renderPasscodeGate("That code doesn't match — try again.");
+    }
+  };
+  document.getElementById('unlockBtn').addEventListener('click', tryUnlock);
+  input.addEventListener('keydown', (e)=>{ if(e.key === 'Enter') tryUnlock(); });
+  input.focus();
+}
+
+async function renderResults(){
+  const el = document.getElementById('resultsView');
+  el.innerHTML = `<div class="card"><p class="qhint">Loading responses...</p></div>`;
+  const records = await loadResponses();
+  const n = records.length;
+  const aclsRecords = records.filter(r=>r.q_aclscert === "Yes");
+  const nAcls = aclsRecords.length;
+  const rnRecords = records.filter(r=>r.q_role === "RN");
+
+  const before = avg(records.map(r=>r.q2_before));
+  const after = avg(records.map(r=>r.q3_after));
+  const value = avg(records.map(r=>r.q1_value));
+  const shockBefore = avg(aclsRecords.map(r=>r.q_shockconf_before));
+  const shockAfter = avg(aclsRecords.map(r=>r.q_shockconf_after));
+
+  let html = `<div class="statrow">
+    <div class="stat"><div class="num">${n}</div><div class="lbl">Responses</div></div>
+    <div class="stat"><div class="num">${value===null?'—':value.toFixed(1)}</div><div class="lbl">Avg value (/5)</div></div>
+    <div class="stat"><div class="num">${before===null||after===null?'—':'+'+(after-before).toFixed(1)}</div><div class="lbl">Compression confidence lift</div></div>
+  </div>
+  <div class="statrow">
+    <div class="stat"><div class="num">${shockBefore===null||shockAfter===null?'—':'+'+(shockAfter-shockBefore).toFixed(1)}</div><div class="lbl">Shock confidence lift</div></div>
+    <div class="stat"><div class="num">${nAcls}</div><div class="lbl">ACLS-authorized</div></div>
+  </div>`;
+
+  html += `<div class="card">
+    <p class="qlabel" style="margin-bottom:14px;">Confidence &amp; value</p>
+    ${scaleBar("Training value", value)}
+    ${scaleBar("Confidence — before workshop", before)}
+    ${scaleBar("Confidence — right now", after)}
+    ${scaleBar("Confidence — shock alone (before today's hands-on practice)", shockBefore, `n = ${nAcls} ACLS-authorized respondents`)}
+    ${scaleBar("Confidence — shock alone (after today's hands-on practice)", shockAfter, `n = ${nAcls} ACLS-authorized respondents`)}
+    ${scaleBar("Confidence — identifying a shockable rhythm independently", avg(aclsRecords.map(r=>r.q_rhythmid)), `n = ${nAcls} ACLS-authorized respondents`)}
+    ${scaleBar("Confidence — defib safety checklist", avg(aclsRecords.map(r=>r.q4_shock)), `n = ${nAcls} ACLS-authorized respondents`)}
+    ${scaleBar("Likelihood to shock without code team present", avg(aclsRecords.map(r=>r.q_shockalone)), `n = ${nAcls} ACLS-authorized respondents`)}
+    <div class="goalline"><span class="goalpill">GOAL ≥ 4.0</span><span>Same scoring convention as the poster's CCF / CCiT targets</span></div>
+  </div>`;
+
+  const barrierWriteIns = aclsRecords.map(r=>r.q_shockbarriers_other).filter(t=>t && t.trim().length>0);
+  html += `<div class="card">
+    <p class="qlabel" style="margin-bottom:14px;">What makes staff hesitate to shock independently</p>
+    <p class="qn" style="margin:-8px 0 12px;">n = ${nAcls} ACLS-authorized respondents</p>
+    ${barsFromCounts(tally(aclsRecords,'q_shockbarriers'), nAcls)}
+    ${barrierWriteIns.length ? `<p class="qn" style="margin-top:14px;">Write-in responses</p>${barrierWriteIns.map(t=>`<div class="commentbox">${t.replace(/</g,'&lt;')}</div>`).join('')}` : ''}
+  </div>`;
+
+  html += `<div class="card">
+    <p class="qlabel" style="margin-bottom:14px;">Refresher cadence — preference</p>
+    ${barsFromCounts(tally(records,'q_refresher_freq'), n)}
+  </div>`;
+
+  html += `<div class="card">
+    <p class="qlabel" style="margin-bottom:14px;">Respondents by role</p>
+    ${barsFromCounts(tally(records,'q_role'), n)}
+  </div>`;
+
+  const unitCounts = {};
+  rnRecords.forEach(r=>{
+    const u = (r.q_unit === "Other, please specify" && r.q_unit_other && r.q_unit_other.trim())
+      ? r.q_unit_other.trim()
+      : r.q_unit;
+    if(u) unitCounts[u] = (unitCounts[u]||0)+1;
+  });
+  html += `<div class="card">
+    <p class="qlabel" style="margin-bottom:14px;">RN responses by home unit</p>
+    <p class="qn" style="margin:-8px 0 12px;">n = ${rnRecords.length} RN respondents</p>
+    ${barsFromCounts(unitCounts, rnRecords.length)}
+  </div>`;
+
+  const comments = records.map(r=>r.q9_comments).filter(c=>c && c.trim().length>0);
+  html += `<div class="card">
+    <p class="qlabel" style="margin-bottom:14px;">Open comments</p>
+    ${comments.length ? comments.map(c=>`<div class="commentbox">${c.replace(/</g,'&lt;')}</div>`).join('') : '<p class="emptynote">No comments yet.</p>'}
+  </div>`;
+
+  el.innerHTML = html;
+}
+
+document.getElementById('tabSurvey').addEventListener('click', ()=>{
+  document.getElementById('tabSurvey').classList.add('active');
+  document.getElementById('tabResults').classList.remove('active');
+  document.getElementById('surveyView').style.display = 'block';
+  document.getElementById('resultsView').style.display = 'none';
+});
+document.getElementById('tabResults').addEventListener('click', ()=>{
+  document.getElementById('tabResults').classList.add('active');
+  document.getElementById('tabSurvey').classList.remove('active');
+  document.getElementById('surveyView').style.display = 'none';
+  document.getElementById('resultsView').style.display = 'block';
+  if(resultsUnlocked){ renderResults(); } else { renderPasscodeGate(); }
+});
+
+renderSurvey();
+</script>
+</body>
+</html>
